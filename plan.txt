@@ -1,0 +1,72 @@
+1.Authentication(Signup , logic manually social auth, update profile ,get profite.
+
+2.Layout
+3.Course
+4.Analytics
+5.Orders
+6.Notification
+
+
+
+new technology used 
+
+medium scale application 
+
+in near future its glow like (becodemy)
+
+next.js some time not next.js
+
+want implement critical feature next.js not suitable for suggestion also node.js not suggested as well.
+
+for largest website use Django 
+
+~caching data maintain (fronted and backend caching data)
+for maintaining over load and buffer.
+cache data what we use in data to access quickly then we expect about.
+
+
+
+
+
+
+Coding Part Using VScode
+
+we using extension like 
+
+~ console ninja
+~ES7+ react
+
+
+~get good connectivity with API.  
+
+~get an real time response and request
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
