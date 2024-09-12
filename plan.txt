@@ -35,11 +35,22 @@ we using extension like
 
 ~ console ninja
 ~ES7+ react
-
+~ESLint
+~gitgraph
+~ mithril enmnet 
+~ path intellisen
 
 ~get good connectivity with API.  
 
 ~get an real time response and request
+
+
+
+install required file in terminal 
+
+
+
+~npm i bcryptjs cookie-parser cors dotenv express ioredis jsonwebtoken mongoose ts-node-dev @types/bcryptjs @types/cookie-parser @types/cors @types/dotenv @types/express @types/ioredis @types/jsonwebtoken @types/mongoose @types/node typescript
 
 
 
