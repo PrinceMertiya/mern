@@ -52,6 +52,222 @@ install required file in terminal
 
 ~npm i bcryptjs cookie-parser cors dotenv express ioredis jsonwebtoken mongoose ts-node-dev @types/bcryptjs @types/cookie-parser @types/cors @types/dotenv @types/express @types/ioredis @types/jsonwebtoken @types/mongoose @types/node typescript
 
+app.ts create
+app.ts{require('dotenv').config(); // Load environment variables
+
+import express, { Request, Response, NextFunction } from 'express'; // Import types
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+
+export const app = express(); // Initialize Express app
+
+// Body parser middleware
+app.use(express.json({ limit: '50mb' }));
+
+// Cookie parser middleware
+app.use(cookieParser());
+
+// CORS middleware
+app.use(cors({
+   origin: process.env.ORIGIN, // Corrected typo
+}));
+
+// Testing API endpoint
+app.get('/test', (req: Request, res: Response, next: NextFunction) => {
+   res.status(200).json({
+      success: true,
+      message: 'API is working', // Corrected spelling
+   });
+});
+
+// Unknown route handler
+app.all('*', (req: Request, res: Response, next: NextFunction) => {
+   const err = new Error(`Route ${req.originalUrl} not found`) as any; // Corrected typo
+   err.statusCode = 404;
+   next(err);
+});
+
+
+
+create server.ts 
+
+import {app} from "./app";
+require("dotenv").config();
+
+
+app.listen(process.env.PORT, () => {
+    console.log(`Server is connected with port ${process.env.PORT}`)
+})
+
+}
+
+
+.env create {
+PORT = 8000
+
+ORIGIN = ['http://localhost:3000']}
+
+go to the Package.json in scripts add
+("dev":"ts-node-dev --respawn --transpile-only server.ts")
+
+
+show all the work done for little setup now we need to connect throw the database  , cloud and redis for data transfer.
+
+
+now create
+
+create new folder utils 
+in utils create database.ts
+
+
+now we need to connect to 3 website for 
+
+mangodbatlas,cloudinary,upstash`
+
+
+mangodb password remember GcFhtBg8yZTeLxhQ
+
+and put in this password part mongodb+srv://support:<db_password>@prime.f3uip.mongodb.net/
+
+put in .env file with 
+
+NODE_ENV = development
+
+DB_URL = mongodb+srv://support:GcFhtBg8yZTeLxhQ@prime.f3uip.mongodb.net/
+
+
+now turn for cloudinary 
+
+so go to cloudinary copy name , api , secret 
+
+then in env use 
+
+CLOUD_NAME =
+CLOUD_API_KEY =
+CLOUD_SECRET_KEY = 
+
+then  create account in upstash 
+
+REDIS_URL =(copy the url from the web site ) and make a change redis to 
+
+
+
+
+
+
+
+for connect to databse we go db.ts
+
+import mongoose from 'mongoose';
+require('dotenv').config();
+
+const dbUrl:string = process.env.DB_URL || '';
+
+const connectDB = async () => {
+    try{
+         awai mongoose.connect(dbUrl).then((data:any) =>
+              console.log(`Database connected with ${data.connection.host}`)
+         })
+     }
+     catch (error){
+         console.log(error.message);
+         setTimeout(connectDB , 5000);
+     }
+}
+
+export default connectDB;
+
+
+go to server.ts 
+      app.listen add
+
+      connectDB();
+
+
+now create a redis file for in utils as redis.ts
+
+import {Redis} from 'ioredis';
+require('dotenv').config();
+
+
+
+const redisClient = () => {
+      if (process.env.REDIS_URL){
+          console.log(`Redis connected failed`);
+          return process.env.REDIS_URL;
+       }
+       throw new Error('Redis connection failed');
+};
+
+export const redis = new Redis(redisClient());
+
+after setup of redit 
+go for creating an exception handing
+and error management 
+
+create file 
+middleware/error.ts
+
+utils create a file as 
+ErrorHandler.ts
+
+
+ErrorHandler 
+
+{
+
+class ErrorHandler extends Error{
+     statusCode: number;
+     
+     constructor(message:any, statusCode:Number){
+           super(message);
+           this.statusCode = statusCode;
+          
+           Error.captureStackTrace(this,this.constructor);
+   }
+}
+
+export default ErrorHandler
+
+
+that part done done error handler now going for error.ts 
+for invalid error occur at authentication and server now working time .
+
+
+error.ts{
+
+import {Request, Response} from "express;
+import ErrorHandler from "../utils/ErrorHandler";
+
+module.exports = (err:any, req:Request, res:Response,next:NextFunction)=>{
+    
+    err.statusCode = err.statusode || 500;
+    err.message = err.message || "Internal Server Error";
+    
+    //wrong mongodb id error 
+    
+    if(err.name == 'CastError'){
+          const message = `Resource not found. Invalid: ${err.path}`;
+          err = new ErrorHandler(message, 400);
+    }
+    
+    //Duplication key error
+    
+    if (err.code == 11000){
+            const message =  
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 
 

@@ -3,6 +3,7 @@ require('dotenv').config(); // Load environment variables
 import express, { Request, Response, NextFunction } from 'express'; // Import types
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import {ErrorMiddleware} from "./middleware/error";
 
 export const app = express(); // Initialize Express app
 
