@@ -236,27 +236,155 @@ for invalid error occur at authentication and server now working time .
 
 error.ts{
 
-import {Request, Response} from "express;
+import { Request, Response, NextFunction } from "express";
 import ErrorHandler from "../utils/ErrorHandler";
 
-module.exports = (err:any, req:Request, res:Response,next:NextFunction)=>{
-    
-    err.statusCode = err.statusode || 500;
+export const ErrorMiddleware = (err: any, req: Request, res: Response, next: NextFunction) => {
+
+    // Set default error status code and message
+    err.statusCode = err.statusCode || 500;
     err.message = err.message || "Internal Server Error";
-    
-    //wrong mongodb id error 
-    
-    if(err.name == 'CastError'){
-          const message = `Resource not found. Invalid: ${err.path}`;
-          err = new ErrorHandler(message, 400);
+
+    // Wrong MongoDB ID error (CastError)
+    if (err.name === 'CastError') {
+        const message = `Resource not found. Invalid: ${err.path}`;
+        err = new ErrorHandler(message, 400);
     }
+
+    // Duplicate key error (Mongoose unique field error)
+    if (err.code === 11000) {
+        const message = `Duplicate field value: ${Object.keys(err.keyValue)} entered.`;
+        err = new ErrorHandler(message, 400);
+    }
+
+    // JWT error: Invalid token
+    if (err.name === 'JsonWebTokenError') {
+        const message = `Invalid JSON Web Token. Please try again.`;
+        err = new ErrorHandler(message, 400);
+    }
+
+    // JWT error: Token expired
+    if (err.name === 'TokenExpiredError') {
+        const message = `Your JSON Web Token has expired. Please try again.`;
+        err = new ErrorHandler(message, 400);
+    }
+
+    // Send error response
+    res.status(err.statusCode).json({
+        success: false,
+        message: err.message,
+        // Optionally include stack trace for development environments:
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+};
     
-    //Duplication key error
-    
-    if (err.code == 11000){
-            const message =  
+
+go to app.ts or 
+import 
+
+import ErrorHandler from "./middleware/error";
 
 
+now create a file in middleware 
+
+catchAsyncErrors.ts
+
+
+import {NextFunction, Request , Response } from "express";
+
+export const CatchASyncError = 
+       (theFunc:any) => (req: Request,res: Response,next: NextFunction) => {
+        Promise.resolve(theFunc(req,res,next)).catch(next);
+    };
+    
+complete error management 
+now we create a folder for model designing
+
+
+import mongoose, { Document, Model, Schema } from "mongoose";
+import bcrypt from "bcryptjs";
+
+const emailRegexPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export interface IUser extends Document {
+  name: string;
+  email: string;
+  password: string;
+  avatar: {
+    public_id: string;
+    url: string;
+  };
+  role: string;
+  isVerified: boolean;
+  courses: Array<{ courseId: string }>;
+  comparePassword: (password: string) => Promise<boolean>;
+}
+
+const userSchema: Schema<IUser> = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Please enter your name"],
+    },
+    email: {
+      type: String,
+      required: [true, "Please enter your email"],
+      validate: {
+        validator: function (value: string) {
+          return emailRegexPattern.test(value);
+        },
+        message: "Please enter a valid email",
+      },
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Please enter your password"],
+      minlength: [6, "Password must be at least 6 characters"],
+      select: false,
+    },
+    avatar: {
+      public_id: { type: String, required: true },
+      url: { type: String, required: true },
+    },
+    role: {
+      type: String,
+      default: "user",
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    courses: [
+      {
+        courseId: {
+          type: String,
+        },
+      },
+    ],
+  },
+  { timestamps: true }
+);
+
+// Hash password before saving
+userSchema.pre<IUser>("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+// Compare password
+userSchema.methods.comparePassword = async function (
+  enteredPassword: string
+): Promise<boolean> {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+const UserModel: Model<IUser> = mongoose.model<IUser>("User", userSchema);
+
+export default UserModel;
 
 
 
