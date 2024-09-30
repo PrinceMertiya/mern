@@ -4,6 +4,7 @@ import express, { Request, Response, NextFunction } from 'express'; // Import ty
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import {ErrorMiddleware} from "./middleware/error";
+import userRouter from "./routes/user.route";
 
 export const app = express(); // Initialize Express app
 
@@ -17,6 +18,10 @@ app.use(cookieParser());
 app.use(cors({
    origin: process.env.ORIGIN, // Corrected typo
 }));
+
+//routes
+
+app.use("/api/v1", userRouter);
 
 // Testing API endpoint
 app.get('/test', (req: Request, res: Response, next: NextFunction) => {
