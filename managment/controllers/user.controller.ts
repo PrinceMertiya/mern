@@ -7,6 +7,7 @@ import jwt, { Secret } from "jsonwebtoken";
 import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
+import {sendToken} from "../utils/jwt";
 
 // Register user interface
 interface IRegistrationBody {
@@ -163,6 +164,8 @@ export const loginUser = CatchASyncError(async(req:Request, res:Response,next:Ne
       return next(new ErrorHandler("Invalid email or password", 400));
     };
 
+    sendToken(user,200,res);
+
     
 }
 catch (error:any){
@@ -171,3 +174,24 @@ catch (error:any){
 }
 
 }); 
+
+
+export const logoutUser = CatchASyncError(async(req:Request,res: Response,next:NextFunction)=> {
+  try{
+    res.cookie("access_token","",{maxAge: 1});
+    res.cookie("refresh_token","",{maxAge: 1});
+
+    res.status(200).json({
+      success:true,
+      message: "Logged out sucessfully",
+
+
+    });
+
+  }
+  catch(error : any){
+    return next(new ErrorHandler(error.message, 400));
+
+  }
+}
+);

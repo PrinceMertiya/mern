@@ -2,7 +2,7 @@ require("dotenv").config();
 import { Response } from "express";
 import { redis } from "./redis";
 import { IUser } from "../model/user.model";
-import { LargeNumberLike } from "crypto";
+
 
 
 
@@ -23,6 +23,9 @@ export const sendToken = (user:IUser, statusCode: number, res:Response) => {
     // upload session to redis
 
 
+    redis.set(user.id,JSON.stringify(user) as any);
+
+
 
     //parse environment variable s to integrates with fallback value
     const accessTokenExpire = parseInt(process.env.ACCESS_TOKEN_EXPIRE || '300', 10);
@@ -39,7 +42,7 @@ export const sendToken = (user:IUser, statusCode: number, res:Response) => {
     
     const refreshTokenOptions: ITokenOptions ={
         expires: new Date(Date.now() + accessTokenExpire * 1000),
-        maxAge: accessTokenExpire,
+        maxAge: refreshTokenExpire,
         httpOnly: true,
         samSite: 'lax',
 
